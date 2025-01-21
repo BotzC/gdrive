@@ -1,5 +1,7 @@
 import { z } from "zod";
+
 import { isDev } from "~/utils/isDev";
+
 import { Schema_Config } from "~/types/schema";
 
 const config: z.input<typeof Schema_Config> = {
@@ -8,7 +10,6 @@ const config: z.input<typeof Schema_Config> = {
    * Even if you're creating a PR, just let me change it myself
    */
   version: "2.0.3",
-
   /**
    * Base path of the app, used for generating links
    *
@@ -31,7 +32,7 @@ const config: z.input<typeof Schema_Config> = {
    *
    * @default false
    */
-  showDeployGuide: false,
+  showDeployGuide: true,
 
   /**
    * How long the cache will be stored in the browser
@@ -50,7 +51,7 @@ const config: z.input<typeof Schema_Config> = {
      * You need to create a new folder and share it with the service account
      * Then, copy the folder id and paste it here
      */
-    rootFolder: "d184987a9c9b27da35e0762c8e98a990869b13ce8ea1ddf7dde3b86ab5b06a35aea57257296fc44d644e1ddf803ff9f5",
+    rootFolder: "b76c7c22083307a3aa99c28ab7cc69851d682f5a250d995679d4be5276cab16ab6c37f4d5b7ad1a9b93fb9bf768e752c",
 
     /**
      * If your rootfolder inside a shared drive, you NEED to set this to true
@@ -65,24 +66,13 @@ const config: z.input<typeof Schema_Config> = {
      *
      * Then you need to encrypt it using `/api/internal/encrypt?q=:shared_drive_id` route
      */
-    isTeamDrive: false,
-    sharedDrive: "",
+    isTeamDrive: true,
+    sharedDrive: "77bfa156c9c9d159112fcb0494ed8545bdaf7a3d567cd760ba2e2e2cd33fcbfc",
 
-    defaultQuery: [
-      "trashed = false",
-      "(not mimeType contains 'google-apps' or mimeType contains 'folder')",
-    ],
+    defaultQuery: ["trashed = false", "(not mimeType contains 'google-apps' or mimeType contains 'folder')"],
     defaultField:
       "id, name, mimeType, thumbnailLink, fileExtension, modifiedTime, size, imageMediaMetadata, videoMediaMetadata, webContentLink, trashed",
     defaultOrder: "folder, name asc, modifiedTime desc",
-
-    /**
-     * Set how many items to display per page in the file list
-     * It's recommended to set this to a reasonable number
-     * Since it will affect the load time
-     * 
-     * @default: 50 items per page | 5 search result
-    */
     itemsPerPage: 50,
     searchResult: 5,
 
@@ -97,76 +87,9 @@ const config: z.input<typeof Schema_Config> = {
      *
      * This will increase the server load, so use it wisely
      *
-     * @default: true
+     * Default: true
      */
     proxyThumbnail: true,
-
-    /**
-     * Special file name that will be used for certain purposes
-     * These files will be ignored when searching for files
-     * and will be hidden from the files list by default
-     * 
-     * Banner will be used for opengraph image for folder
-     * By default, all folder will use default og image
-     */
-    specialFile: {
-      password: ".password",
-      readme: ".readme.md",
-      banner: ".banner",
-    },
-
-    /**
-     * Reason why banner has multiple extensions:
-     * - If I use contains query, it will also match the file or folder that contains the word.
-     *   (e.g: File / folder with the name of "Test Password" will be matched)
-     * - If I use = query, it will only match the exact name, hence the multiple extensions
-     *
-     * You can add more extensions if you want
-     */
-    hiddenFiles: [
-      ".password",
-      ".readme.md",
-      ".banner",
-      ".banner.jpg",
-      ".banner.png",
-      ".banner.webp",
-    ],
-
-    /**
-     * Allow user to download protected file without password.
-     * If this set to false, download link will have temporary token attached to it
-     * If this set to true, user can download the file without password as long as they have the link
-     *
-     * @default: false
-     */
-    allowDownloadProtectedFile: false,
-
-    /**
-     * Duration in hours.
-     * In version 2, this will be used for download link expiration.
-     * If you need it under 1 hour, you can use math expression. (e.g: (5 / 60) * 1 = 5 minutes)
-     *
-     * This only affect when the user download the file
-     * For example if you set it for example 30 minutes (0.5)
-     * After 30 minutes, and the user still downloading the file, the download will NOT be interrupted
-     * But if the user refresh the page / trying to download again, the download link will be expired
-     *
-     * @default: 6 hours
-     */
-    temporaryTokenDuration: 6,
-
-    /**
-     * Maximum file size that can be downloaded via api routes
-     * If it's larger than this, it will be redirected to the file url
-     *
-     * If you're using Vercel, they have a limit of ~4 - ~4.5MB response size
-     * ref: https://vercel.com/docs/platform/limits#serverless-function-payload-size-limit
-     * If you're using another platform, you can match the limit with your platform
-     * Or you can set this to 0 to disable the limit
-     *
-     * @default: 4MB
-     */
-    maxFileSize: 4194304,
 
     /**
      * Only show preview for files that are smaller than this size
@@ -179,9 +102,68 @@ const config: z.input<typeof Schema_Config> = {
      *
      * You can also set this to 0 to disable the limit
      *
-     * @default: 100MB
+     * Default: 100MB
      */
-    streamMaxSize: 104857600,
+    streamMaxSize: 100 * 1024 * 1024,
+
+    /**
+     * Special file name that will be used for certain purposes
+     * These files will be ignored when searching for files
+     * and will be hidden from the files list by default
+     */
+    specialFile: {
+      password: ".password",
+      readme: ".readme.md",
+      /**
+       * Banner will be used for opengraph image for folder
+       * By default, all folder will use default og image
+       */
+      banner: ".banner",
+    },
+    /**
+     * Reason why banner has multiple extensions:
+     * - If I use contains query, it will also match the file or folder that contains the word.
+     *   (e.g: File / folder with the name of "Test Password" will be matched)
+     * - If I use = query, it will only match the exact name, hence the multiple extensions
+     *
+     * You can add more extensions if you want
+     */
+    hiddenFiles: [".password", ".readme.md", ".banner", ".banner.jpg", ".banner.png", ".banner.webp"],
+
+    /**
+     * Allow user to download protected file without password.
+     * If this set to false, download link will have temporary token attached to it
+     * If this set to true, user can download the file without password as long as they have the link
+     *
+     * Default: false
+     */
+    allowDownloadProtectedFile: false,
+    /**
+     * Duration in hours.
+     * In version 2, this will be used for download link expiration.
+     * If you need it under 1 hour, you can use math expression. (e.g: (5 / 60) * 1 = 5 minutes)
+     *
+     * This only affect when the user download the file
+     * For example if you set it for example 30 minutes (0.5)
+     * After 30 minutes, and the user still downloading the file, the download will NOT be interrupted
+     * But if the user refresh the page / trying to download again, the download link will be expired
+     *
+     * Default: 6 hours
+     */
+    temporaryTokenDuration: 6,
+
+    /**
+     * Maximum file size that can be downloaded via api routes
+     * If it's larger than this, it will be redirected to the file url
+     *
+     * If you're using Vercel, they have a limit of ~4 - ~4.5MB response size
+     * ref: https://vercel.com/docs/platform/limits#serverless-function-payload-size-limit
+     * If you're using another platform, you can match the limit with your platform
+     * Or you can set this to 0 to disable the limit
+     *
+     * Default: 4MB
+     */
+    maxFileSize: 4 * 1024 * 1024,
   },
 
   siteConfig: {
@@ -195,28 +177,17 @@ const config: z.input<typeof Schema_Config> = {
      */
     siteName: "next-gdrive-index",
     siteNameTemplate: "%s - %t",
-    siteDescription: "A Google Drive Index built using Next.js",
-
-    /**
-     * Site Icon will be used on navbar
-     * Favicon will be used as website icon
-    */
+    siteDescription: "A simple file browser for Google Drive",
     siteIcon: "/logo.svg",
+    siteAuthor: "mbaharip",
     favIcon: "/favicon.png",
-
-    /**
-     * Both are used on metadata
-     * Affects the value of footer
-    */
-    siteAuthor: "mbahArip",
-    twitterHandle: "@mbahArip",
-
     /**
      * Next.js Metadata robots object
      *
      * ref: https://nextjs.org/docs/app/api-reference/functions/generate-metadata#robots
      */
     robots: "noindex, nofollow",
+    twitterHandle: "@mbaharip_",
 
     /**
      * Show file extension on the file name
@@ -225,7 +196,7 @@ const config: z.input<typeof Schema_Config> = {
      *    file.txt   |   file
      *    100KB      |   txt / 100KB
      *
-     * @default: false
+     * Default: false
      */
     showFileExtension: false,
 
@@ -245,10 +216,7 @@ const config: z.input<typeof Schema_Config> = {
      * - {{ handle }} will be replaced with the twitter handle from twitterHandle config above
      * - {{ creator }} will be replaced with mbaharip if you want to credit me
      */
-    footer: [
-      "{{ siteName }} *v{{ version }}* @ {{ repository }}",
-      "{{ year }} - Made with ❤️ by **{{ author }}**",
-    ],
+    footer: ["{{ siteName }} *v{{ version }}* @ {{ repository }}", "{{ year }} - Made with ❤️ by **{{ author }}**"],
 
     /**
      * Site wide password protection
@@ -285,7 +253,25 @@ const config: z.input<typeof Schema_Config> = {
      *  external?: boolean
      * }
      */
-    navbarItems: [],
+    navbarItems: [
+      {
+        icon: "FileText",
+        name: "Documentation",
+        href: "https://github.com/mbahArip/next-gdrive-index/wiki",
+        external: true,
+      },
+      {
+        icon: "Github",
+        name: "Github",
+        href: "https://www.github.com/mbaharip",
+        external: true,
+      },
+      {
+        icon: "Mail",
+        name: "Contact",
+        href: "mailto:support@mbaharip.com",
+      },
+    ],
 
     /**
      * Add support / donation links on the navbar
@@ -296,7 +282,23 @@ const config: z.input<typeof Schema_Config> = {
      *  href: string,
      * }
      */
-    supports: [],
+    supports: [
+      {
+        name: "Paypal",
+        currency: "USD",
+        href: "https://paypal.me/mbaharip",
+      },
+      {
+        name: "Ko-fi",
+        currency: "USD",
+        href: "https://ko-fi.com/mbaharip",
+      },
+      {
+        name: "Saweria",
+        currency: "IDR",
+        href: "https://saweria.co/mbaharip",
+      },
+    ],
   },
 };
 
